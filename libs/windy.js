@@ -502,7 +502,7 @@ var Windy = function (params) {
       evolve();
       draw();
       // console.log("wok");
-      capturer.capture(canvas);
+      // capturer.capture(canvas);
     }
 
     frame();
