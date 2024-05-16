@@ -1,5 +1,9 @@
 # wind simulation experiment for Earthmap.
 
+run project
+
+`npx vite`
+
 generate video from screen-captures
 
 `ffmpeg -i %07d.jpg -r 60 -pix_fmt yuva420p output.mov`
