@@ -9,10 +9,10 @@
 }
 
 body {
-  background-color: #1F2C3F;
+  background-color: black;
   padding: 0px;
   margin: 0px;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 #mapbox_map {
@@ -33,16 +33,16 @@ body {
   width: 250px;
   left: 20px;
   top: 20px;
-  color: #E5E8EA;
+  color: #e5e8ea;
 }
 
 .mapboxgl-ctrl-geocoder {
   min-width: 100%;
-  background-color: #114059;
+  background-color: red;
 }
 
 .mapboxgl-ctrl-geocoder input {
-  color: #E5E8EA;
+  color: #e5e8ea;
 }
 
 .mapboxgl-ctrl-geocoder--button {
@@ -50,29 +50,29 @@ body {
 }
 
 .mapboxgl-ctrl-geocoder svg path {
-  fill: #E5E8EA;
+  fill: #e5e8ea;
 }
 
 .mapboxgl-ctrl-geocoder--input {
-  color: #E5E8EA !important;
+  color: #e5e8ea !important;
 }
 
 .suggestions-wrapper a {
-  background-color: #232A3E;
-  color: #E5E8EA !important;
+  background-color: #232a3e;
+  color: #e5e8ea !important;
 }
 
 .suggestions-wrapper a {
   background-color: #114059;
-  color: #E5E8EA !important;
+  color: #e5e8ea !important;
 }
 
 .suggestions-wrapper a:hover {
-  background-color: #232A3E !important;
-  color: #E5E8EA !important;
+  background-color: #232a3e !important;
+  color: #e5e8ea !important;
 }
 
 .suggestions-wrapper .active a {
-  background-color: #232A3E !important;
-  color: #E5E8EA !important;
+  background-color: #232a3e !important;
+  color: #e5e8ea !important;
 }
