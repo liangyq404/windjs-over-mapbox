@@ -1,4 +1,11 @@
-wind simulation experiment for Earthmap.
+# wind simulation experiment for Earthmap.
+
+generate video from screen-captures
+
+`ffmpeg -i %07d.jpg -r 60 -pix_fmt yuva420p output.mov`
+
+
+
 
 
 # windjs-over-mapbox
