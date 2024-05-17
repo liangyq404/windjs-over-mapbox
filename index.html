@@ -35,12 +35,12 @@
           display: none;
           border: 1px solid red;
           background: black;
-          height: 200vh;
-          width: 150vw;
+          /* height: 200vh;
+          width: 100vw; */
           position: absolute;
-          left: -50vw;
+          /* left: -50vw; */
           top: 0;
-          overflow: hidden;
+          overflow: scroll;
         "
       ></canvas>
       <div id="geocoder" class="geocoder" style="display: none"></div>
@@ -117,7 +117,7 @@
           clearTimeout(timeout);
         }
         timeout = setTimeout(function () {
-          let particleWidth = 0.3;
+          let particleWidth = 2;
 
           mapcanvas.style.display = "initial";
           mapcanvas.width = width;
@@ -142,9 +142,9 @@
       function getEventObject(map) {
         const canvas = map.getCanvas();
         const dimensions = map.getBounds();
-        // console.log(canvas.width, canvas.height);
-        const w = 6400,
-          h = 4800;
+        console.log(canvas.width, canvas.height);
+        const w = 6720,
+          h = 5040;
         // console.log(dimensions);
 
         const result = {
