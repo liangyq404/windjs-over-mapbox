@@ -9,6 +9,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
     <script src="https://unpkg.com/ccapture.js@1.1.0/build/CCapture.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@sakitam-gis/mapbox-wind@1.0.0-alpha.10/dist/mapbox-wind.js"></script>
 
     <!--   LOCAL SCRIPTS -->
     <script src="./libs/windy.js"></script>
@@ -68,6 +69,14 @@
           [180, 90], // Northeast coordinates
         ],
       });
+
+      map.addLayer(
+        sampleFill({
+          id: "windbackground",
+          source: "./guangling2.json",
+          "sample-fill-opacify": 0.8,
+        })
+      );
 
       map.doubleClickZoom.disable();
 
@@ -148,10 +157,10 @@
         // console.log(dimensions);
 
         const result = {
-          // width: canvas.width,
-          // height: canvas.height,
-          width: w,
-          height: h,
+          width: canvas.width,
+          height: canvas.height,
+          // width: w,
+          // height: h,
           north: dimensions.getNorth(),
           south: dimensions.getSouth(),
           west: dimensions.getWest(),

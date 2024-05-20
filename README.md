@@ -6,7 +6,7 @@ run project
 
 generate video from screen-captures
 
-`ffmpeg -i %07d.jpg -r 60 -pix_fmt yuva420p output.mov`
+`ffmpeg -i %07d.jpg -r 60 -pix_fmt yuv444p output.mov`
 
 
 
