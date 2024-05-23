@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "@astrosat/windgl": "^0.1.0",
-    "easy-screen-capture": "^2.0.1"
+    "dat.gui": "^0.7.9",
+    "easy-screen-capture": "^2.0.1",
+    "heatmap.js": "^2.0.5"
   }
 }
