@@ -33,34 +33,39 @@
       });
 
       var customizedGradient = {
-        // ".1": "#FF9100",
-        ".2": "#FF5E00",
-        ".3": "#FF8800",
-        ".4": "#FFBF00",
+        ".1": "#DCDCDC",
+        // ".2": "#FF5E00",
+        // ".3": "#FF8800",
+        // ".4": "#FFBF00",
         // ".5": "#EEFF00",
         // ".6": "#FF6200",
         // ".7": "#FF6200",
-        ".8": "#EEFF00",
-        ".9": "#B7FF00",
-        "1.0": "#33FF00",
+        ".8": "#AAAAAA",
+        ".9": "#D29B1C",
+        "1.0": "#852E16",
       };
 
-      // get data
+      // var customizedGradient = {
+      //   // ".1": "#FF9100",
+      //   ".2": "#FF5E00",
+      //   ".3": "#FF8800",
+      //   ".4": "#FFBF00",
+      //   // ".5": "#EEFF00",
+      //   // ".6": "#FF6200",
+      //   // ".7": "#FF6200",
+      //   ".8": "#EEFF00",
+      //   ".9": "#B7FF00",
+      //   "1.0": "#33FF00",
+      // };
 
-      //   const watercolorConfig = {
-      //     colors: 3,
-      //     shapePoints: 5,
-      //     spread: 450,
-      //     colorSize: 350,
-      //     deformations: 2,
-      //     layers: 55,
-      //     randomSeed: 217,
-      //     sigma: 2,
-      //     blend: "lighten",
-      //     mask: true,
-      //     maskCircles: 300,
-      //     maskCircleSize: 50,
-      //   };
+      // get data
+      
+      let dataArray = [];
+      await fetch("./scaled.json")
+        .then((res) => res.json())
+        .then((data) => (dataArray = data));
+
+      console.log(dataArray);
 
       var heatmapInstance = h337.create({
         container: container,
@@ -82,17 +87,20 @@
 
       for (let i = 0; i < 90; i++) {
         for (let j = 0; j < 90; j++) {
-          var val = magnitudes.value[j * 90 + i];
-          var normalizedVal = Math.floor(val / 2) / 100;
+          // var val = magnitudes.value[j * 90 + i];
+          // var normalizedVal = Math.floor(val / 2) / 100;
+
+          var val = dataArray[j][i];
+          // console.log(val);
+          var normalizedVal = val / 100;
           // console.log(normalizedVal);
           // var val = windData.v[i * 90 + j];
           // var normalizedVal = val + 10;
-          // if (normalizedVal < 1) {
           var point = {
             x: i * 10,
             y: j * 10,
             value: normalizedVal,
-            radius: normalizedVal * 30,
+            radius: normalizedVal * 15,
           };
           // console.log(point.radius);
           points.push(point);
