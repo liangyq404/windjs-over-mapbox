@@ -40,8 +40,21 @@
         // ".5": "#EEFF00",
         // ".6": "#FF6200",
         // ".7": "#FF6200",
-        ".8": "#AAAAAA",
-        ".9": "#D29B1C",
+        // ".98": "#AAAAAA",
+        ".95": "#D29B1C",
+        "1.0": "#852E16",
+      };
+
+      var customizedGradient = {
+        ".1": "#DCDCDC",
+        // ".2": "#FF5E00",
+        // ".3": "#FF8800",
+        // ".4": "#FFBF00",
+        // ".5": "#EEFF00",
+        // ".6": "#FF6200",
+        // ".7": "#FF6200",
+        ".90": "#AAAAAA",
+        ".98": "#D29B1C",
         "1.0": "#852E16",
       };
 
@@ -59,25 +72,25 @@
       // };
 
       // get data
-      
+
       let dataArray = [];
       await fetch("./scaled.json")
         .then((res) => res.json())
         .then((data) => (dataArray = data));
 
-      console.log(dataArray);
+      console.log(dataArray.length);
 
       var heatmapInstance = h337.create({
         container: container,
-        // backgroundColor: "#89FF2F",
+        backgroundColor: "#89FF2F",
         gradient: customizedGradient,
         maxOpacity: 1,
         blur: 1,
         minOpacity: 1,
       });
 
-      const width = 90;
-      const height = 90;
+      const width = 900;
+      const height = 900;
       var points = [];
       // var max = 7;
 
@@ -85,8 +98,8 @@
         return (value - min) / (max - min);
       }
 
-      for (let i = 0; i < 90; i++) {
-        for (let j = 0; j < 90; j++) {
+      for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
           // var val = magnitudes.value[j * 90 + i];
           // var normalizedVal = Math.floor(val / 2) / 100;
 
@@ -97,10 +110,10 @@
           // var val = windData.v[i * 90 + j];
           // var normalizedVal = val + 10;
           var point = {
-            x: i * 10,
-            y: j * 10,
+            x: i * 1,
+            y: j * 1,
             value: normalizedVal,
-            radius: normalizedVal * 15,
+            radius: normalizedVal * 5,
           };
           // console.log(point.radius);
           points.push(point);

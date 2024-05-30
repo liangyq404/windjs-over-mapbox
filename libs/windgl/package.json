@@ -1,86 +1,51 @@
 {
-  "name": "@astrosat/windgl",
-  "version": "0.1.0",
-  "description": "A MapboxGL plugin for animated GRIB data visualization",
-  "main": "dist/windgl.cjs.js",
-  "module": "dist/windgl.esm.js",
-  "browser": "dist/windgl.umd.js",
-  "files": [
-    "dist"
-  ],
+  "name": "webgl-wind",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "prepublishOnly": "npm run build",
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "test": "if test \"$CI\" = 'true' || test \"$TRAVIS\" = 'true'; then \n  eslint src && jest \nelse jest --watch \nfi",
+    "test": "eslint src/*.js demo/index.js data/prepare.js",
     "serve": "st -nc -i index.html",
-    "start": "run-p  serve watch"
+    "start": "run-p serve watch"
   },
-  "keywords": [
-    "mapboxgl",
-    "wind",
-    "particles"
-  ],
-  "contributors": [
-    "Vladimir Agafonkin",
-    "Jakub Hampl"
-  ],
+  "type": "module",
+  "keywords": [],
+  "author": "Vladimir Agafonkin",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.3.4",
-    "@babel/preset-env": "^7.3.4",
-    "babel-jest": "^24.3.1",
-    "babel-plugin-glslify": "^2.0.0",
-    "eslint": "^5.15.0",
-    "eslint-config-prettier": "^3.1.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "geometry-polyfill": "^1.0.4",
-    "gl": "^4.1.1",
-    "gl-shader": "^4.2.1",
-    "gl-shader-output": "^2.0.1",
-    "glsl-minifier": "0.0.13",
-    "glslify": "^7.0.0",
-    "glslx": "^0.1.26",
-    "jest": "^24.3.1",
-    "jest-image-snapshot": "^2.8.1",
-    "mapbox-gl": "^0.53.1",
-    "npm-run-all": "^4.1.5",
+    "eslint": "^3.15.0",
+    "eslint-config-mourner": "^2.0.1",
+    "npm-run-all": "^4.0.1",
     "pngjs": "^3.4.0",
-    "prettier": "^1.14.3",
-    "rollup": "^0.60.7",
-    "rollup-plugin-buble": "^0.19.0",
-    "rollup-plugin-commonjs": "^9.2.1",
-    "rollup-plugin-glslify": "^1.1.0",
-    "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-pluginutils": "^2.5.0",
+    "rollup": "^0.41.4",
+    "rollup-plugin-buble": "^0.15.0",
+    "rollup-plugin-string": "^2.0.2",
     "rollup-watch": "^3.2.2",
     "st": "^1.2.0"
   },
   "eslintConfig": {
+    "extends": "mourner",
     "parserOptions": {
-      "ecmaVersion": 2018,
       "sourceType": "module"
     },
-    "extends": [
-      "eslint:recommended"
-    ],
-    "plugins": [
-      "prettier"
-    ],
-    "env": {
-      "browser": true,
-      "commonjs": true,
-      "node": true,
-      "es6": true
+    "globals": {
+      "dat": false,
+      "WindGL": false
     },
     "rules": {
-      "prettier/prettier": "error"
+      "no-var": 2,
+      "prefer-const": 2
     }
   },
   "dependencies": {
-    "@mapbox/mapbox-gl-style-spec": "^13.6.0"
-  },
-  "peerDependencies": {
-    "mapbox-gl": "^0.53.1"
+    "alea": "^1.0.1",
+    "axios": "^1.6.8",
+    "ccapture.js": "^1.1.0",
+    "heatmap.js": "^2.0.5",
+    "rgb-hex": "^4.1.0",
+    "sharp": "^0.33.4",
+    "simplex-noise": "^4.0.1"
   }
 }
