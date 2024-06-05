@@ -8,6 +8,7 @@ const dataStore = {
 
 const readAsArray = async (filePath, outputPath, key) => {
   sharp(filePath)
+    .resize(900)
     .grayscale()
     .raw()
     .toBuffer({ resolveWithObject: true })
@@ -49,7 +50,9 @@ const writeAsJson = (outputPath, data) => {
   });
 };
 
-readAsArray("./wind.png", "./data/windData.json", "windData");
-readAsArray("./height.png", "./data/heightData.json", "heightData");
+// readAsArray("./download2.png", "./data/windData.json", "windData");
+// readAsArray("./height.png", "./data/heightData.json", "heightData");
+// readAsArray("./png/blurred.png", "./data/blurred.json", "blurred");
+readAsArray("./png/blurred.png", "./data/blurred.json", "blurred");
 
 // readAsArray("./png/scaled.png", "./data/scaled.json", "scaled");
