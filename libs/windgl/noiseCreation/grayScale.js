@@ -2,8 +2,8 @@ import fs from "fs";
 import { PNG } from "pngjs";
 
 const data = JSON.parse(fs.readFileSync("./data/noisedWindSpeeds.json"));
-let width = 4096,
-  height = 4096;
+let width = 900,
+  height = 900;
 
 // 创建一个空的 PNG 图像
 const png = new PNG({

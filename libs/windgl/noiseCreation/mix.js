@@ -2,30 +2,31 @@ import alea from "alea";
 import { createNoise2D } from "simplex-noise";
 import fs from "fs";
 import { PNG } from "pngjs";
-import { errorMonitor } from "events";
+import jimp from "jimp";
 
-let seedE = 44987, // seed for noiseE
-  seedM = 2345; // seed for noiseE
+// mark this:
+// let seedE = 55524, // seed for wind speed
+//   seedM = 323, // seed for height
+//   seedN = 300; // seed for 2nd noise
+// const frequencyE = 9, // for height
+//   frequencyM = 4, // for wind speed
+//   frequencyN = 10;
 
-const frequencyE = 2,
-  frequencyM = 2;
+let seedE = 55524, // seed for wind speed
+  seedM = 323, // seed for height
+  seedN = 300; // seed for 2nd noise
 
-let dataWeight = 0.8,
-  noiseWeight = 1 - dataWeight;
+const frequencyE = 9, // for height
+  frequencyM = 4, // for wind speed
+  frequencyN = 10;
 
-let heightWeight = 0.3,
-  windSpeedWeight = 1 - heightWeight;
-
-let width = 4096,
-  height = 4096;
+let width = 900,
+  height = 900;
 
 let mappedHeights = [],
   mappedWindSpeeds = [];
 
-// let noisedHeights = [],
-//   noisedWindSpeeds = [];
-
-// let mixedValues = [];
+let noise = [];
 
 const heightData = JSON.parse(fs.readFileSync("./data/heightData.json"));
 const windSpeedData = JSON.parse(fs.readFileSync("./data/windData.json"));
@@ -49,14 +50,9 @@ heightData.forEach((data) => {
   mappedHeights.push(normalize(data, 1));
 });
 
-// console.log(mappedWindSpeeds);
-
-// console.log(mappedWindSpeeds);
-
-// console.log(windSpeedData.length);
-
 const genE = createNoise2D(alea(seedE));
 const genM = createNoise2D(alea(seedM));
+const genN = createNoise2D(alea(seedN));
 
 function noiseE(nx, ny) {
   return genE(frequencyM * nx, frequencyM * ny) / 2 + 0.5;
@@ -66,65 +62,74 @@ function noiseM(nx, ny) {
   return genM(frequencyE * nx, frequencyE * ny) / 2 + 0.5;
 }
 
-const applyNoise = (dataWeight, dataArray) => {
+function noiseN(nx, ny) {
+  return genN(frequencyN * nx, frequencyN * ny) / 2 + 0.5;
+}
+
+const applyNoise = (dataWeight, ignore, dataArray) => {
   const noisedDataValues = [];
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const nx = x / width - 0.5;
-      const ny = y / height - 0.5;
-
-      const e = 1.0 * noiseE(1 * nx, 1 * ny) + 0.5 * noiseE(2 * nx, 2 * ny);
-      const m = 1.0 * noiseM(1 * nx, 1 * ny) + 0.75 * noiseM(2 * nx, 2 * ny);
-
-      // 这种归一化方法使用了幂函数对值进行转换。它首先将原始值 e 除以一个常数（在这里是 1.0 + 0.5），然后将结果取 5 的幂。这种方法的特点是它对原始值的较小变化施加了更大的影响，因为幂函数具有快速增长的特性。这种归一化方法可能会导致某些值之间的差异被放大，从而更加突出地显示出数据的变化。
-      // const eNormalized = Math.pow(e / (1.0 + 0.5), 5.0).toFixed(2); // toFixed(2) 仅保留小数点后两位
-      // 这种归一化方法简单地将原始值 m 除以一个常数（在这里是 1.0 + 0.75）。它的作用是将原始值缩放到一个更小的范围内，使得数据更易于处理或可视化。这种方法通常用于确保数据在一定范围内，以便进行比较或其他操作。
-      // const mNormalized = m / (1.0 + 0.75);
-      const mNormalized = m / (1.0 + 0.75);
-      const eNormalized = e / (1.0 + 0.75);
-
       const dataValue = dataArray[y][x];
-      const noisedDataValue =
-        dataValue * dataWeight + eNormalized * (1 - dataWeight);
+      // console.log(dataValue);
+      if (dataValue < ignore) {
+        const nx = x / width - 0.5;
+        const ny = y / height - 0.5;
+        const e = 1.0 * noiseE(1 * nx, 1 * ny) + 0.8 * noiseE(2 * nx, 2 * ny);
+        const m = 1.0 * noiseM(1 * nx, 1 * ny) + 0.75 * noiseM(2 * nx, 2 * ny);
 
-      noisedDataValues.push(noisedDataValue);
+        // 这种归一化方法使用了幂函数对值进行转换。它首先将原始值 e 除以一个常数（在这里是 1.0 + 0.5），然后将结果取 5 的幂。这种方法的特点是它对原始值的较小变化施加了更大的影响，因为幂函数具有快速增长的特性。这种归一化方法可能会导致某些值之间的差异被放大，从而更加突出地显示出数据的变化。
+        // const eNormalized = Math.pow(e / (1.0 + 0.5), 5.0).toFixed(2); // toFixed(2) 仅保留小数点后两位
+        // 这种归一化方法简单地将原始值 m 除以一个常数（在这里是 1.0 + 0.75）。它的作用是将原始值缩放到一个更小的范围内，使得数据更易于处理或可视化。这种方法通常用于确保数据在一定范围内，以便进行比较或其他操作。
+        // const mNormalized = m / (1.0 + 0.75);
+        // const mNormalized = m / (1.0 + 0.5);
+        const eNormalized = e / (1.0 + 0.75);
+        const mNormalized = m / (1.0 + 0.8);
 
-      // const heightValue = mappedHeights[y][x];
-      // const noisedHeightValue =
-      //   heightValue * dataWeight + eNormalized * (1 - dataWeight);
-      // noisedHeights.push(noisedHeightValue);
+        noise.push(mNormalized);
+        // console.log(eNormalized);
 
-      // const windSpeedValue = mappedWindSpeeds[y][x];
-      // const noisedWindValue =
-      //   windSpeedValue * dataWeight + mNormalized * (1 - dataWeight);
-      // noisedWindSpeeds.push(noisedWindValue);
-
-      // const mixedValue =
-      //   noisedHeightValue * heightWeight + noisedWindValue * windSpeedWeight;
-      // mixedValues.push(mixedValue);
+        const noisedDataValue =
+          dataValue * dataWeight + eNormalized * (1 - dataWeight);
+        noisedDataValues.push(noisedDataValue);
+      } else {
+        noisedDataValues.push(1);
+        noise.push(1);
+      }
     }
   }
   return noisedDataValues;
 };
 
-const mixData = (weight, dataArray1, dataArray2) => {
+const mixData = (weight, heightArray, windSpeedArray) => {
   const mixedValues = [];
-  for (let i = 0; i < dataArray1.length; i++) {
-    const mixedValue = dataArray1[i] * weight + dataArray2[i] * (1 - weight);
-    mixedValues.push(mixedValue);
+  for (let i = 0; i < heightArray.length; i++) {
+    const heightValue = heightArray[i];
+    if (heightValue == 1) {
+      mixedValues.push(1);
+    } else {
+      const mixedValue =
+        heightArray[i] * weight + windSpeedArray[i] * (1 - weight);
+      mixedValues.push(mixedValue);
+    }
   }
   return mixedValues;
 };
 
-const noisedHeights = applyNoise(0.4, mappedHeights);
-const noisedWindSpeeds = applyNoise(0.6, mappedWindSpeeds);
+const noisedHeights = applyNoise(0.7, 0.98, mappedHeights);
+const noisedWindSpeeds = applyNoise(0.2, 2, mappedWindSpeeds);
 
-const mixedValues = mixData(0.3, noisedHeights, noisedWindSpeeds);
+const mixedValues = mixData(0.5, noisedHeights, noisedWindSpeeds);
+// const mixedValues2 = mixData(0.5, noise, mixedValues);
 
-// console.log(noisedHeights[0], noisedWindSpeeds[0]);
-console.log(mixedValues);
+// console.log(noise);
 
-const createPNG = (data, output) => {
+// console.log(noise);
+
+// // console.log(noisedHeights[0], noisedWindSpeeds[0]);
+// console.log(mixedValues);
+
+const createPNG = async (data, output) => {
   const png = new PNG({ width, height });
 
   // Map the data values to grayscale pixel values (0-255)
@@ -205,9 +210,21 @@ const createHue = (data, output) => {
   });
 };
 
+async function blur(path) {
+  const image = await jimp.read(path);
+  image.blur(4).write("./png/blurred.png", (err) => console.log(err));
+}
+
 createPNG(noisedHeights, "noisedHeights");
 createPNG(noisedWindSpeeds, "noisedWindSpeeds");
 createPNG(mixedValues, "mixed");
+
+// createPNG(noise, "noise");
+// createPNG(mixedValues2, "mixedValues2");
+
+setTimeout(() => {
+  blur("./png/mixed.png");
+}, 1000);
 
 // createHue(mixedValues, "hue");
 

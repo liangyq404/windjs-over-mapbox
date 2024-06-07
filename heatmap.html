@@ -10,8 +10,29 @@
     <!-- <script src="./dat.gui.min.js"></script> -->
   </head>
   <body>
-    <div id="heat" style="width: 900px; height: 900px"></div>
-
+    <div
+      id="bg"
+      style="
+        width: 900px;
+        height: 900px;
+        background-image: url('./libs/windgl/noiseCreation/height.png');
+        background-size: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+      "
+    ></div>
+    <div
+      id="heat"
+      style="
+        width: 900px;
+        height: 900px;
+        /* opacity: 0.7; */
+        position: absolute;
+        top: 0;
+        left: 0;
+      "
+    ></div>
     <script type="module">
       const container = document.getElementById("heat");
       import * as dat from "dat.gui";
@@ -24,7 +45,6 @@
         heatmapInstance.setData(data);
       };
       var gui = new dat.GUI();
-
       var params = {
         max: 7,
       };
@@ -32,94 +52,176 @@
         updateHeatmap(params);
       });
 
-      var customizedGradient = {
-        ".1": "#DCDCDC",
-        // ".2": "#FF5E00",
-        // ".3": "#FF8800",
-        // ".4": "#FFBF00",
-        // ".5": "#EEFF00",
-        // ".6": "#FF6200",
-        // ".7": "#FF6200",
-        // ".98": "#AAAAAA",
-        ".95": "#D29B1C",
-        "1.0": "#852E16",
+      // noised.PNG 这个版本可以work
+      var warm1 = {
+        ".1": "#741616",
+        ".3": "#B28C68",
+        ".4": "#D2C8A6",
+        ".5": "#CDCDCD",
+        ".9": "#DFDFDF",
+        "1.0": "#E8E8E8",
       };
 
-      var customizedGradient = {
-        ".1": "#DCDCDC",
-        // ".2": "#FF5E00",
-        // ".3": "#FF8800",
-        // ".4": "#FFBF00",
-        // ".5": "#EEFF00",
-        // ".6": "#FF6200",
-        // ".7": "#FF6200",
-        ".90": "#AAAAAA",
-        ".98": "#D29B1C",
-        "1.0": "#852E16",
+      var warm_bright = {
+        // ".1": "#5F0404",
+        ".2": "#850707",
+        ".25": "#E28821",
+        ".3": "#F0BB2B",
+        ".32": "#E9DB7D",
+        ".36": "#D8DEB1",
+        ".5": "#EEEEEE",
+        ".6": "#FFFFFF",
+        // ".9": "#FFFFFF",
+        // "1.0": "#FFFFFF",
+      };
+
+      var warm2 = {
+        "1.0": "#DFDFDF",
+        ".4": "#CFBD83",
+        ".35": "#D3B243",
+        ".3": "#C97E37",
+        ".25": "#C8601F",
+        ".1": "#8D0C0C",
+      };
+
+      var cold1 = {
+        ".1": "#1D0C8D",
+        ".3": "#7BA1C9",
+        ".4": "#C3D2A6",
+        ".5": "#CDCDCD",
+        ".9": "#DFDFDF",
+        "1.0": "#E8E8E8",
+      };
+
+      var warm_smooth = {
+        ".1": "#741616",
+        ".2": "#B28C68",
+        ".3": "#D2C8A6",
+        ".6": "#CDCDCD",
+        ".9": "#DFDFDF",
+        "1.0": "#E8E8E8",
+      };
+
+      var warm_light = {
+        ".1": "#A26868",
+        ".2": "#B5A496",
+        ".3": "#C3BEA9",
+        ".6": "#EAEAEA",
+        ".9": "#EEEEEE",
+        "1.0": "#F8F8F8",
+      };
+
+      var selectSize = "afterNoise";
+      const switchSize = {
+        beforeNoise: {
+          width: 90,
+          height: 90,
+          multiply: 10,
+          gradient: warm2,
+        },
+        afterNoise: {
+          width: 900,
+          height: 900,
+          multiply: 1,
+          gradient: warm_bright,
+        },
       };
 
       // var customizedGradient = {
-      //   // ".1": "#FF9100",
-      //   ".2": "#FF5E00",
-      //   ".3": "#FF8800",
-      //   ".4": "#FFBF00",
-      //   // ".5": "#EEFF00",
-      //   // ".6": "#FF6200",
-      //   // ".7": "#FF6200",
-      //   ".8": "#EEFF00",
-      //   ".9": "#B7FF00",
-      //   "1.0": "#33FF00",
+      //   "1.0": "#DFDFDF",
+      //   ".8": "#C1C1C1",
+      //   // ".7": "#C3C3C3",
+      //   // ".6": "#D3B243",
+      //   ".3": "#C4846B",
+      //   ".0": "#8D0C0C",
       // };
 
-      // get data
-
       let dataArray = [];
-      await fetch("./scaled.json")
+      await fetch("./libs/windgl/noiseCreation/data/blurred.json")
         .then((res) => res.json())
         .then((data) => (dataArray = data));
 
-      console.log(dataArray.length);
-
-      var heatmapInstance = h337.create({
-        container: container,
-        backgroundColor: "#89FF2F",
-        gradient: customizedGradient,
-        maxOpacity: 1,
-        blur: 1,
-        minOpacity: 1,
-      });
-
-      const width = 900;
-      const height = 900;
-      var points = [];
-      // var max = 7;
+      // console.log(dataArray);
+      let windData = [];
+      await fetch("./libs/windgl/data/guangling2.json")
+        .then((res) => res.json())
+        .then((data) => {
+          const uData = data[0].data;
+          const vData = data[1].data;
+          windData.push(uData, vData);
+        });
 
       function normalize(value, min, max) {
         return (value - min) / (max - min);
       }
 
-      for (let i = 0; i < width; i++) {
-        for (let j = 0; j < height; j++) {
-          // var val = magnitudes.value[j * 90 + i];
-          // var normalizedVal = Math.floor(val / 2) / 100;
+      var points = [];
 
-          var val = dataArray[j][i];
-          // console.log(val);
-          var normalizedVal = val / 100;
-          // console.log(normalizedVal);
-          // var val = windData.v[i * 90 + j];
-          // var normalizedVal = val + 10;
-          var point = {
-            x: i * 1,
-            y: j * 1,
-            value: normalizedVal,
-            radius: normalizedVal * 5,
-          };
-          // console.log(point.radius);
-          points.push(point);
-          // }
+      if (selectSize == "afterNoise") {
+        const width = switchSize.afterNoise.width;
+        const height = switchSize.afterNoise.height;
+        const multiply = switchSize.afterNoise.multiply;
+        const fill = switchSize.afterNoise.gradient;
+
+        var heatmapInstance = h337.create({
+          container: container,
+          // backgroundColor: "#8C1E00",
+          gradient: fill,
+          maxOpacity: 1,
+          blur: 1,
+          minOpacity: 1,
+        });
+
+        for (let i = 0; i < width; i++) {
+          for (let j = 0; j < height; j++) {
+            // noised.PNG 这个版本可以work
+            var val = dataArray[j][i];
+            var normalizedVal = val / 1000 + 0.1;
+
+            var point = {
+              x: i * multiply,
+              y: j * multiply,
+              value: normalizedVal,
+              radius: normalizedVal * 13, // noised.PNG 这个版本可以work
+            };
+            points.push(point);
+            // }
+          }
+        }
+      } else if (selectSize == "beforeNoise") {
+        const width = switchSize.beforeNoise.width;
+        const height = switchSize.beforeNoise.height;
+        const multiply = switchSize.beforeNoise.multiply;
+        const fill = switchSize.beforeNoise.gradient;
+
+        var heatmapInstance = h337.create({
+          container: container,
+          // backgroundColor: "#8C1E00",
+          gradient: fill,
+          maxOpacity: 1,
+          blur: 1,
+          minOpacity: 1,
+        });
+
+        for (let i = 0; i < width; i++) {
+          for (let j = 0; j < height; j++) {
+            var val = Math.sqrt(
+              windData[0][j * width + i] ** 3 + windData[1][j * width + i] ** 3
+            );
+            var normalizedVal = val / 10 + 0.1;
+            console.log(normalizedVal);
+            var point = {
+              x: i * multiply,
+              y: j * multiply,
+              value: normalizedVal,
+              radius: normalizedVal * 10,
+            };
+            points.push(point);
+            // }
+          }
         }
       }
+
       updateHeatmap(params);
     </script>
   </body>
