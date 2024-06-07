@@ -1,126 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
+    <title>Wind Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Heatmap</title>
-    <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/watercolor-canvas@1.1.1/watercolor-canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/visual-heatmap@2.1.0/dist/visualHeatmap.min.js"></script>
-    <!-- <script src="./dat.gui.min.js"></script> -->
+
+    <!--   CDN SCRIPTS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js"></script>
+    <script src="https://unpkg.com/ccapture.js@1.1.0/build/CCapture.all.min.js"></script>
+
+    <!--   LOCAL SCRIPTS -->
+    <script src="./libs/windy.js"></script>
+
+    <!--   CDN STYLES -->
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css"
+      type="text/css"
+    />
+
+    <!-- <link href="./styles/styles.css" rel="stylesheet" /> -->
   </head>
-  <body>
-    <div id="heat" style="width: 900px; height: 900px"></div>
 
-    <script type="module">
-      const container = document.getElementById("heat");
-      import * as dat from "dat.gui";
+  <body translate="no">
+    <div style="display: initial" class="wind-map-container">
+      <canvas
+        id="mapcanvas"
+        style="
+          display: none;
+          border: 1px solid red;
+          background: blue;
+          height: 100vh;
+          width: 100vw;
+          position: absolute;
+          /* left: -50vw; */
+          top: 0;
+        "
+      ></canvas>
+      <div id="geocoder" class="geocoder" style="display: none"></div>
+    </div>
 
-      const updateHeatmap = (params) => {
-        var data = {
-          max: params.max,
-          data: points,
-        };
-        heatmapInstance.setData(data);
-      };
-      var gui = new dat.GUI();
+    <!--   MAPBOX MAP CONTAINER -->
+    <div class="mapbox-map-container" style="display: none">
+      <div id="mapbox_map"></div>
+    </div>
 
-      var params = {
-        max: 7,
-      };
-      gui.add(params, "max", 0, 10).onChange(function () {
-        updateHeatmap(params);
+    <script>
+      let windy;
+      let timeout;
+
+      mapboxgl.accessToken =
+        "pk.eyJ1Ijoia2F0YW1hcmFuaTQiLCJhIjoiY2ppNDdtenh5MDFkYTN2b2VjOG5ucmIybCJ9.AG0bncC30hHPHVRnVGeCxQ";
+
+      const map = new mapboxgl.Map({
+        container: "mapbox_map",
+        center: [114, 39.8],
+        zoom: 9,
+        style: "mapbox://styles/mapbox/satellite-v9",
+        maxBounds: [
+          [-180, -90], // Southwest coordinates
+          [180, 90], // Northeast coordinates
+        ],
       });
 
-      var customizedGradient = {
-        ".1": "#DCDCDC",
-        // ".2": "#FF5E00",
-        // ".3": "#FF8800",
-        // ".4": "#FFBF00",
-        // ".5": "#EEFF00",
-        // ".6": "#FF6200",
-        // ".7": "#FF6200",
-        // ".98": "#AAAAAA",
-        ".95": "#D29B1C",
-        "1.0": "#852E16",
-      };
+      var geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl,
+        marker: false,
+        flyTo: false,
+      });
+      document.getElementById("geocoder").appendChild(geocoder.onAdd(map));
 
-      var customizedGradient = {
-        ".1": "#DCDCDC",
-        // ".2": "#FF5E00",
-        // ".3": "#FF8800",
-        // ".4": "#FFBF00",
-        // ".5": "#EEFF00",
-        // ".6": "#FF6200",
-        // ".7": "#FF6200",
-        ".90": "#AAAAAA",
-        ".98": "#D29B1C",
-        "1.0": "#852E16",
-      };
-
-      // var customizedGradient = {
-      //   // ".1": "#FF9100",
-      //   ".2": "#FF5E00",
-      //   ".3": "#FF8800",
-      //   ".4": "#FFBF00",
-      //   // ".5": "#EEFF00",
-      //   // ".6": "#FF6200",
-      //   // ".7": "#FF6200",
-      //   ".8": "#EEFF00",
-      //   ".9": "#B7FF00",
-      //   "1.0": "#33FF00",
-      // };
-
-      // get data
-
-      let dataArray = [];
-      await fetch("./scaled.json")
-        .then((res) => res.json())
-        .then((data) => (dataArray = data));
-
-      console.log(dataArray.length);
-
-      var heatmapInstance = h337.create({
-        container: container,
-        backgroundColor: "#89FF2F",
-        gradient: customizedGradient,
-        maxOpacity: 1,
-        blur: 1,
-        minOpacity: 1,
+      map.on("resize", (e) => {
+        resetWind(map);
       });
 
-      const width = 900;
-      const height = 900;
-      var points = [];
-      // var max = 7;
+      map.on("move", (e) => {
+        resetWind(map);
+      });
 
-      function normalize(value, min, max) {
-        return (value - min) / (max - min);
-      }
+      map.on("zoom", (e) => {
+        resetWind(map);
+      });
 
-      for (let i = 0; i < width; i++) {
-        for (let j = 0; j < height; j++) {
-          // var val = magnitudes.value[j * 90 + i];
-          // var normalizedVal = Math.floor(val / 2) / 100;
+      map.once("style.load", function () {
+        resetWind(map);
+      });
 
-          var val = dataArray[j][i];
-          // console.log(val);
-          var normalizedVal = val / 100;
-          // console.log(normalizedVal);
-          // var val = windData.v[i * 90 + j];
-          // var normalizedVal = val + 10;
-          var point = {
-            x: i * 1,
-            y: j * 1,
-            value: normalizedVal,
-            radius: normalizedVal * 5,
-          };
-          // console.log(point.radius);
-          points.push(point);
-          // }
+      function resetWind(map) {
+        const canvas = map.getCanvas();
+        console.log(canvas.width, canvas.height);
+        const north = 40.75993479597116,
+          south = 38.21680547878188,
+          west = 110.8027343749983,
+          east = 115.19726562499733,
+          // width = 3200,
+          // height = 2400;
+          width = 6720,
+          height = 5040;
+        // width = canvas.width,
+        // height = canvas.height;
+
+        if (windy) {
+          windy.stop();
         }
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+        timeout = setTimeout(function () {
+          let particleWidth = 2;
+          mapcanvas.style.display = "initial";
+          mapcanvas.width = width;
+          mapcanvas.height = height;
+          windy.start(
+            [
+              [0, 0],
+              [width, height],
+            ],
+            width,
+            height,
+            [
+              [west, south],
+              [east, north],
+            ],
+            { particleLineWidth: particleWidth }
+          );
+        }, 500);
       }
-      updateHeatmap(params);
+
+      fetch("./data/guangling2.json")
+        .then((d) => d.json())
+        .then((data) => {
+          console.log(data);
+          // Remember - dom elements with ID, are exposed globally, so mapcanvas element exists already
+          windy = new Windy({ canvas: mapcanvas, data: data });
+          resetWind(map);
+        });
     </script>
   </body>
 </html>

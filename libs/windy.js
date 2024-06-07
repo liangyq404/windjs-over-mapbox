@@ -17,9 +17,7 @@ var Windy = function (params) {
     format: "jpg",
     framerate: 60,
     quality: 100,
-    //startTime: 5,
     timeLimit: 2,
-    // autoSaveTime: 5,
     verbose: true,
   });
 
@@ -457,7 +455,6 @@ var Windy = function (params) {
 
     var g = params.canvas.getContext("2d");
     g.lineWidth = PARTICLE_LINE_WIDTH;
-    console.log();
     g.fillStyle = fadeFillStyle;
     g.globalAlpha = 1;
 

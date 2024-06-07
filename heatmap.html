@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Heatmap</title>
+    <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/watercolor-canvas@1.1.1/watercolor-canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/visual-heatmap@2.1.0/dist/visualHeatmap.min.js"></script>
+    <!-- <script src="./dat.gui.min.js"></script> -->
+  </head>
+  <body>
+    <div id="heat" style="width: 900px; height: 900px"></div>
+
+    <script type="module">
+      const container = document.getElementById("heat");
+      import * as dat from "dat.gui";
+
+      const updateHeatmap = (params) => {
+        var data = {
+          max: params.max,
+          data: points,
+        };
+        heatmapInstance.setData(data);
+      };
+      var gui = new dat.GUI();
+
+      var params = {
+        max: 7,
+      };
+      gui.add(params, "max", 0, 10).onChange(function () {
+        updateHeatmap(params);
+      });
+
+      var customizedGradient = {
+        ".1": "#DCDCDC",
+        // ".2": "#FF5E00",
+        // ".3": "#FF8800",
+        // ".4": "#FFBF00",
+        // ".5": "#EEFF00",
+        // ".6": "#FF6200",
+        // ".7": "#FF6200",
+        // ".98": "#AAAAAA",
+        ".95": "#D29B1C",
+        "1.0": "#852E16",
+      };
+
+      var customizedGradient = {
+        ".1": "#DCDCDC",
+        // ".2": "#FF5E00",
+        // ".3": "#FF8800",
+        // ".4": "#FFBF00",
+        // ".5": "#EEFF00",
+        // ".6": "#FF6200",
+        // ".7": "#FF6200",
+        ".90": "#AAAAAA",
+        ".98": "#D29B1C",
+        "1.0": "#852E16",
+      };
+
+      // var customizedGradient = {
+      //   // ".1": "#FF9100",
+      //   ".2": "#FF5E00",
+      //   ".3": "#FF8800",
+      //   ".4": "#FFBF00",
+      //   // ".5": "#EEFF00",
+      //   // ".6": "#FF6200",
+      //   // ".7": "#FF6200",
+      //   ".8": "#EEFF00",
+      //   ".9": "#B7FF00",
+      //   "1.0": "#33FF00",
+      // };
+
+      // get data
+
+      let dataArray = [];
+      await fetch("./scaled.json")
+        .then((res) => res.json())
+        .then((data) => (dataArray = data));
+
+      console.log(dataArray.length);
+
+      var heatmapInstance = h337.create({
+        container: container,
+        backgroundColor: "#89FF2F",
+        gradient: customizedGradient,
+        maxOpacity: 1,
+        blur: 1,
+        minOpacity: 1,
+      });
+
+      const width = 900;
+      const height = 900;
+      var points = [];
+      // var max = 7;
+
+      function normalize(value, min, max) {
+        return (value - min) / (max - min);
+      }
+
+      for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
+          // var val = magnitudes.value[j * 90 + i];
+          // var normalizedVal = Math.floor(val / 2) / 100;
+
+          var val = dataArray[j][i];
+          // console.log(val);
+          var normalizedVal = val / 100;
+          // console.log(normalizedVal);
+          // var val = windData.v[i * 90 + j];
+          // var normalizedVal = val + 10;
+          var point = {
+            x: i * 1,
+            y: j * 1,
+            value: normalizedVal,
+            radius: normalizedVal * 5,
+          };
+          // console.log(point.radius);
+          points.push(point);
+          // }
+        }
+      }
+      updateHeatmap(params);
+    </script>
+  </body>
+</html>
